@@ -29,7 +29,7 @@ This is a modern, responsive React-based website built for Deep Hull Marine, a p
 ## 📁 Project Structure
 
 ```
-symmetrical-octo-lamp/
+deephull/
 ├── index.html              # Main app entry point
 ├── index-bdrpnltx.js      # React app bundle (production)
 ├── index-pgpn7qvg.css     # Styles bundle (production)
