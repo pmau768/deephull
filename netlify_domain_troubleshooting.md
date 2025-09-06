@@ -114,4 +114,4 @@ Based on your `netlify.toml`, your site is configured as a Single Page Applicati
 1. Run the domain checker script
 2. Verify DNS configuration with your domain provider
 3. Check Netlify dashboard for domain status
-4. Wait for DNS propagation and SSL certificate provisioning
+4. Wait for DNS propagation and SSL certificate provisioning.

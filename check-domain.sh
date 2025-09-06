@@ -37,24 +37,24 @@ check_command() {
 }
 
 # Check required commands
-check_command "nslookup"
 check_command "dig"
 check_command "curl"
 check_command "openssl"
 
 # Check if domain resolves
 echo -e "${BLUE}1. DNS Resolution Check:${NC}"
-if nslookup "$CUSTOM_DOMAIN" > /dev/null 2>&1; then
+DNS_IPS=$(dig "$CUSTOM_DOMAIN" +short)
+if [ -n "$DNS_IPS" ]; then
     echo -e "${GREEN}✅ Domain resolves successfully${NC}"
-    # Show the actual IP addresses
     echo -e "${BLUE}   IP addresses:${NC}"
-    dig "$CUSTOM_DOMAIN" +short | sed 's/^/   /'
+    echo "$DNS_IPS" | sed 's/^/   /'
 else
     echo -e "${RED}❌ Domain does not resolve${NC}"
     echo -e "${YELLOW}   This could mean:${NC}"
     echo "   - Domain doesn't exist"
     echo "   - DNS records not configured"
     echo "   - DNS server issues"
+    exit 1
 fi
 
 echo ""
@@ -119,9 +119,9 @@ fi
 echo ""
 echo -e "${BLUE}5. WWW Subdomain Check:${NC}"
 WWW_DOMAIN="www.$CUSTOM_DOMAIN"
-if nslookup "$WWW_DOMAIN" > /dev/null 2>&1; then
+WWW_IPS=$(dig "$WWW_DOMAIN" +short)
+if [ -n "$WWW_IPS" ]; then
     echo -e "${GREEN}✅ WWW subdomain is configured${NC}"
-    WWW_IPS=$(dig "$WWW_DOMAIN" +short)
     if echo "$WWW_IPS" | grep -E '^(75\.2\.|52\.|3\.|.*\.netlify\.app)' > /dev/null; then
         echo -e "${GREEN}   → Points to Netlify${NC}"
     else
