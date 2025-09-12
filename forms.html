@@ -7,6 +7,109 @@
     <meta name="description" content="Get in touch with Deep Hull Marine for professional diving services, 24/7 emergency marine assistance, hull cleaning, and comprehensive underwater services in Jacksonville and St. Augustine.">
     <link rel="icon" href="/favicon.ico">
     <style>
+        /* --- Animated SVG Wave for Hero --- */
+        .hero-wave {
+            position: absolute;
+            left: 0; right: 0; top: 0;
+            width: 100%;
+            height: 120px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* --- Fade/Slide-in Animations --- */
+        .fade-slide-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeSlideIn 1s cubic-bezier(.5,1.5,.5,1) forwards;
+        }
+        .fade-slide-in.delay-1 { animation-delay: 0.3s; }
+        .fade-slide-in.delay-2 { animation-delay: 0.6s; }
+        @keyframes fadeSlideIn {
+            to { opacity: 1; transform: none; }
+        }
+
+        /* --- Service Highlights --- */
+        .service-highlights {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            padding: 1.5rem 1rem;
+            border-radius: 0 0 1rem 1rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        .service-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255,255,255,0.08);
+            border-radius: 0.75rem;
+            padding: 1rem 0.75rem;
+            min-width: 120px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+            color: #fff;
+            font-size: 0.95rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeSlideIn 0.8s cubic-bezier(.5,1.5,.5,1) forwards;
+        }
+        .service-card:nth-child(1) { animation-delay: 0.2s; }
+        .service-card:nth-child(2) { animation-delay: 0.4s; }
+        .service-card:nth-child(3) { animation-delay: 0.6s; }
+        .service-card svg {
+            width: 32px; height: 32px;
+            margin-bottom: 0.5rem;
+            fill: #fff;
+        }
+
+        /* --- Glowing CTA Button --- */
+        .submit-btn {
+            box-shadow: 0 0 0 0 #3b82f6;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.3s;
+        }
+        .submit-btn:hover {
+            background: #1e3a8a;
+            transform: translateY(-1px) scale(1.04);
+            box-shadow: 0 0 12px 2px #3b82f6;
+        }
+        .submit-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        .submit-btn.bounce-in {
+            animation: bounceIn 0.7s cubic-bezier(.5,1.5,.5,1) forwards;
+        }
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.7) translateY(40px); }
+            60% { opacity: 1; transform: scale(1.1) translateY(-10px); }
+            80% { transform: scale(0.95) translateY(0); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* --- Ripple Effect for Buttons --- */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            background: rgba(59,130,246,0.3);
+            pointer-events: none;
+        }
+        @keyframes ripple {
+            to { transform: scale(2.5); opacity: 0; }
+        }
+
+        /* --- Responsive Service Highlights --- */
+        @media (max-width: 768px) {
+            .service-highlights {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem 0.5rem;
+            }
+        }
+        /* ...existing code... */
         * {
             margin: 0;
             padding: 0;
@@ -188,24 +291,42 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Contact Deep Hull Marine</h1>
-            <p>Professional diving service - 24/7 emergency marine assistance. Not just hull cleaning.</p>
+    <div class="container" style="position:relative;">
+        <!-- Animated SVG Wave for Hero -->
+        <svg class="hero-wave" viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#667eea" fill-opacity="0.5" d="M0,40 C480,120 960,0 1440,80 L1440,120 L0,120 Z"></path></svg>
+        <div class="header" style="position:relative; z-index:2;">
+            <h1 class="fade-slide-in">Contact Deep Hull Marine</h1>
+            <p class="fade-slide-in delay-1">Professional diving service - 24/7 emergency marine assistance. Not just hull cleaning.</p>
         </div>
-        
+
+        <!-- Service Highlights Section -->
+        <div class="service-highlights">
+            <div class="service-card">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2" stroke="#fff" stroke-width="2" fill="none"/></svg>
+                <div>24/7 Emergency Response</div>
+            </div>
+            <div class="service-card">
+                <svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="8" rx="4"/><path d="M8 12h8" stroke="#fff" stroke-width="2" fill="none"/></svg>
+                <div>Hull Cleaning & Prop Polishing</div>
+            </div>
+            <div class="service-card">
+                <svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20" stroke="#fff" stroke-width="2" fill="none"/></svg>
+                <div>Commercial & Yacht Services</div>
+            </div>
+        </div>
+
         <div class="forms-wrapper">
             <a href="/" class="back-link">Back to Homepage</a>
-            
+
             <!-- Contact Form -->
             <div class="form-section">
-                <h2 class="form-title">General Contact</h2>
+                <h2 class="form-title fade-slide-in delay-2">General Contact</h2>
                 <form name="contact-form" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" class="form" action="/success" role="form" aria-labelledby="contact-form-title">
                     <input type="hidden" name="form-name" value="contact-form" />
                     <div class="honeypot" aria-hidden="true">
                         <label>Don't fill this out if you're human: <input name="bot-field" /></label>
                     </div>
-                    
+
                     <fieldset class="form-row" aria-required="true">
                         <legend class="sr-only">Name</legend>
                         <div class="form-group">
@@ -217,7 +338,7 @@
                             <input type="text" id="contact-lastName" name="lastName" required aria-required="true" />
                         </div>
                     </fieldset>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="contact-email">Email Address <span class="required">*</span></label>
@@ -228,31 +349,31 @@
                             <input type="tel" id="contact-phone" name="phone" required aria-required="true" placeholder="(904) 570-0910" />
                         </div>
                     </div>
-                    
+
                     <div class="form-group full-width">
                         <label for="contact-subject">Subject <span class="required">*</span></label>
                         <input type="text" id="contact-subject" name="subject" required />
                     </div>
-                    
+
                     <div class="form-group full-width">
                         <label for="contact-message">Message <span class="required">*</span></label>
                         <textarea id="contact-message" name="message" required placeholder="Tell us how we can help you..."></textarea>
                     </div>
-                    
+
                     <div id="contact-status" class="sr-only" aria-live="polite"></div>
-                    <button type="submit" class="submit-btn">Send Message</button>
+                    <button type="submit" class="submit-btn bounce-in">Send Message</button>
                 </form>
             </div>
 
             <!-- Quote Request Form -->
             <div class="form-section">
-                <h2 class="form-title">Request a Quote</h2>
+                <h2 class="form-title fade-slide-in delay-2">Request a Quote</h2>
                 <form name="quote-request" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" class="form" action="/success" role="form" aria-labelledby="quote-form-title">
                     <input type="hidden" name="form-name" value="quote-request" />
                     <div class="honeypot" aria-hidden="true">
                         <label>Don't fill this out if you're human: <input name="bot-field" /></label>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="quote-firstName">First Name <span class="required">*</span></label>
@@ -263,7 +384,7 @@
                             <input type="text" id="quote-lastName" name="lastName" required />
                         </div>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="quote-email">Email Address <span class="required">*</span></label>
@@ -274,7 +395,7 @@
                             <input type="tel" id="quote-phone" name="phone" required placeholder="(904) 570-0910" />
                         </div>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="quote-vesselType">Vessel Type <span class="required">*</span></label>
@@ -294,7 +415,7 @@
                             <input type="text" id="quote-vesselLength" name="vesselLength" placeholder="e.g., 35 feet" />
                         </div>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="quote-serviceType">Service Type <span class="required">*</span></label>
@@ -313,7 +434,7 @@
                             <input type="text" id="quote-location" name="location" placeholder="Marina or dock location" />
                         </div>
                     </div>
-                    
+
                     <div class="form-group full-width">
                         <label for="quote-urgency">Urgency</label>
                         <select id="quote-urgency" name="urgency">
@@ -324,14 +445,14 @@
                             <option value="flexible">Flexible timing</option>
                         </select>
                     </div>
-                    
+
                     <div class="form-group full-width">
                         <label for="quote-message">Additional Information</label>
                         <textarea id="quote-message" name="message" placeholder="Any additional details about your vessel or service needs..."></textarea>
                     </div>
-                    
+
                     <div id="quote-status" class="sr-only" aria-live="polite"></div>
-                    <button type="submit" class="submit-btn">Request Quote</button>
+                    <button type="submit" class="submit-btn bounce-in">Request Quote</button>
                 </form>
             </div>
         </div>
@@ -349,7 +470,6 @@
                 var status = document.getElementById(statusId);
                 form.addEventListener('submit', function(){
                     if(status) status.textContent = 'Submitting…';
-                    // focus the status so screen readers pick up change in some browsers
                     if(status) status.focus && status.focus();
                 });
             }
@@ -357,6 +477,24 @@
             hookForm('contact-form', 'contact-status');
             hookForm('quote-request', 'quote-status');
         })();
+
+        // Ripple effect for CTA buttons
+        document.querySelectorAll('.submit-btn').forEach(function(btn){
+            btn.addEventListener('click', function(e){
+                var ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                var rect = btn.getBoundingClientRect();
+                var size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+                ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+                btn.style.position = 'relative';
+                btn.appendChild(ripple);
+                ripple.addEventListener('animationend', function(){
+                    ripple.remove();
+                });
+            });
+        });
     </script>
 </body>
 </html>
