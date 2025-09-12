@@ -169,3 +169,67 @@ CNAME   www     your-site-name.netlify.app
 ---
 
 *Built with ❤️ by the Deep Hull Marine team*
+
+---
+
+## 👩‍💻 Developer Guide
+
+This section describes how to run tests, linters, and developer helpers locally.
+
+
+Prerequisites
+
+- Linux / macOS shell or Windows WSL
+- bash, curl, dig (dnsutils), openssl
+- Optional: Python 3 to create a virtualenv for pre-commit
+
+Run the domain checker (interactive):
+
+```bash
+chmod +x check-domain.sh
+./check-domain.sh
+```
+
+Run the domain checker non-interactively (useful in CI or scripts):
+
+```bash
+./check-domain.sh example.com
+# or pipe a domain:
+printf 'nonexistent.example\n' | ./check-domain.sh
+```
+
+Run the project's tests (shell tests):
+
+```bash
+bash tests/check-domain-test.sh
+```
+
+Run shellcheck across shell scripts (helper provided):
+
+```bash
+# install shellcheck on Ubuntu/Debian: sudo apt-get install -y shellcheck
+./scripts/run-shellcheck.sh
+```
+
+Pre-commit hooks
+
+- A `.pre-commit-config.yaml` is included. In some CI/dev environments fetching remote hook repos may be blocked. To enable hooks locally:
+
+```bash
+# create a venv (optional) and install pre-commit
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip pre-commit
+pre-commit install
+pre-commit run --all-files
+```
+
+CI
+
+- GitHub Actions CI is configured in `.github/workflows/ci.yml`. The CI job installs `shellcheck` and `dnsutils` (`dig`) and runs the shell tests. Pushes and pull requests to `main` will run the workflow.
+
+Notes and troubleshooting
+
+- If `dig` is missing on your machine, install `dnsutils` (Debian/Ubuntu): `sudo apt-get install -y dnsutils`.
+- If pre-commit fails to fetch hooks in CI or restricted environments, rely on the CI-provided shellcheck step and the local `scripts/run-shellcheck.sh` helper.
+

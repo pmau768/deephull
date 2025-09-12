@@ -1,6 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Colors for output
+# Fail fast, treat unset vars as errors, and propagate failures in pipelines
+set -euo pipefail
+
+# Colors for output (plain fallback if terminal doesn't support)
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -10,17 +13,33 @@ NC='\033[0m' # No Color
 echo -e "${BLUE}=== Netlify Domain Configuration Checker ===${NC}"
 echo ""
 
-# Get the custom domain from user
-read -p "Enter your custom domain (e.g., example.com): " CUSTOM_DOMAIN
+# Allow domain to be passed as first arg (for CI / scripts) or prompt interactively
+if [ $# -ge 1 ]; then
+    CUSTOM_DOMAIN="$1"
+else
+    # If running interactively, prompt. If receiving a pipe, read from stdin.
+    if [ -t 0 ]; then
+        read -r -p "Enter your custom domain (e.g., example.com): " CUSTOM_DOMAIN
+    else
+        # Read a single line from stdin
+        if ! read -r CUSTOM_DOMAIN; then
+            echo -e "${RED}No domain provided via stdin. Exiting.${NC}"
+            exit 1
+        fi
+    fi
+fi
+
+# Trim whitespace
+CUSTOM_DOMAIN=$(echo "$CUSTOM_DOMAIN" | tr -d '\r' | xargs)
 
 if [ -z "$CUSTOM_DOMAIN" ]; then
     echo -e "${RED}No domain provided. Exiting.${NC}"
     exit 1
 fi
 
-# Validate domain format
-if ! echo "$CUSTOM_DOMAIN" | grep -E '^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.[a-zA-Z]{2,}$' > /dev/null; then
-    echo -e "${RED}Invalid domain format. Please enter a valid domain.${NC}"
+# Basic domain format validation (allows subdomains)
+if ! echo "$CUSTOM_DOMAIN" | grep -E '^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z]{2,})+$' > /dev/null; then
+    echo -e "${RED}Invalid domain format. Please enter a valid domain (e.g. example.com).${NC}"
     exit 1
 fi
 
@@ -29,11 +48,18 @@ echo -e "${BLUE}Checking domain: ${YELLOW}$CUSTOM_DOMAIN${NC}"
 echo ""
 
 # Function to check command availability
+# Function to check command availability (non-fatal option)
 check_command() {
     if ! command -v "$1" &> /dev/null; then
-        echo -e "${RED}Error: $1 is not installed. Please install it to run this script.${NC}"
-        exit 1
+        if [ "${2:-fatal}" = "optional" ]; then
+            echo -e "${YELLOW}Warning: $1 is not installed. Skipping checks that require it.${NC}"
+            return 1
+        else
+            echo -e "${RED}Error: $1 is not installed. Please install it to run this script.${NC}"
+            exit 1
+        fi
     fi
+    return 0
 }
 
 # Check required commands
@@ -43,7 +69,7 @@ check_command "openssl"
 
 # Check if domain resolves
 echo -e "${BLUE}1. DNS Resolution Check:${NC}"
-DNS_IPS=$(dig "$CUSTOM_DOMAIN" +short)
+DNS_IPS=$(dig "$CUSTOM_DOMAIN" +short || true)
 if [ -n "$DNS_IPS" ]; then
     echo -e "${GREEN}✅ Domain resolves successfully${NC}"
     echo -e "${BLUE}   IP addresses:${NC}"
@@ -59,7 +85,7 @@ fi
 
 echo ""
 echo -e "${BLUE}2. HTTP Response Check:${NC}"
-HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://$CUSTOM_DOMAIN" 2>/dev/null)
+HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://$CUSTOM_DOMAIN" 2>/dev/null || echo "000")
 if [ "$HTTP_STATUS" = "200" ]; then
     echo -e "${GREEN}✅ Site is accessible (HTTP 200)${NC}"
 elif [ "$HTTP_STATUS" = "000" ]; then
@@ -84,7 +110,7 @@ fi
 
 echo ""
 echo -e "${BLUE}3. SSL Certificate Check:${NC}"
-if timeout 10 openssl s_client -connect "$CUSTOM_DOMAIN:443" -servername "$CUSTOM_DOMAIN" < /dev/null 2>/dev/null | openssl x509 -noout -dates > /dev/null 2>&1; then
+if check_command "openssl" optional && timeout 10 openssl s_client -connect "$CUSTOM_DOMAIN:443" -servername "$CUSTOM_DOMAIN" < /dev/null 2>/dev/null | openssl x509 -noout -dates > /dev/null 2>&1; then
     echo -e "${GREEN}✅ SSL certificate is valid${NC}"
     echo -e "${BLUE}   Certificate details:${NC}"
     timeout 10 openssl s_client -connect "$CUSTOM_DOMAIN:443" -servername "$CUSTOM_DOMAIN" < /dev/null 2>/dev/null | openssl x509 -noout -dates 2>/dev/null | sed 's/^/   /'
@@ -104,7 +130,7 @@ fi
 
 echo ""
 echo -e "${BLUE}4. Netlify Load Balancer Check:${NC}"
-NETLIFY_IPS=$(dig "$CUSTOM_DOMAIN" +short | grep -E '^(75\.2\.|52\.|3\.)')
+NETLIFY_IPS=$(dig "$CUSTOM_DOMAIN" +short 2>/dev/null | grep -E '^(75\.2\.|52\.|3\.)' || true)
 if [ -n "$NETLIFY_IPS" ]; then
     echo -e "${GREEN}✅ Domain points to Netlify load balancer${NC}"
     echo -e "${BLUE}   Netlify IP addresses:${NC}"
